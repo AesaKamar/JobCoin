@@ -8,9 +8,9 @@ import scala.util.{Failure, Success}
 import cats._
 import cats.data._
 import cats.implicits._
-import cats.effect._
-import hammock.Status
-import org.scalacheck.rng.Seed
+import monix.eval._
+
+import pprint._
 
 //======================
 // Domain Objects
@@ -33,12 +33,12 @@ case object FailedTransfer extends Transfer
 //======================
 
 trait AddressesClient {
-  def get(addr: BitcoinAddress): IO[(JobCoinValue, List[Transaction])]
+  def get(addr: BitcoinAddress): Task[(JobCoinValue, List[Transaction])]
 }
 
 trait TransactionsClient {
-  def get(): IO[List[Transaction]]
-  def post(transaction: Transaction): IO[Option[Transaction]]
+  def get(): Task[List[Transaction]]
+  def post(transaction: Transaction): Task[Option[Transaction]]
 }
 
 //======================
@@ -53,7 +53,7 @@ trait Mixer {
   def houseAddress: BitcoinAddress
 
   def tradeAddressesForNewDeposit(
-      incomingAddresses: Set[BitcoinAddress]): IO[BitcoinAddress]
+      incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress]
 }
 
 /**
@@ -75,13 +75,14 @@ case class MixerImpl(
 
   lazy val houseAddress: BitcoinAddress = generateAddress()
 
-  def doMix(incomingAddresses: Set[BitcoinAddress]): IO[Option[Unit]] = {
+  def doMix(incomingAddresses: Set[BitcoinAddress]): Task[Option[Unit]] = {
 
     val res = for {
       depositAddress <- tradeAddressesForNewDeposit(incomingAddresses)
-      depositStatus <- watch(depositAddress)(Instant.now(),
-                                             30 seconds,
-                                             3 seconds)
+      depositStatus <- watch(depositAddress, ???, incomingAddresses)(
+        Instant.now(),
+        30 seconds,
+        3 seconds)
       deposit <- addressesClient.get(depositAddress)
       transferToHouseAccount <- transactionsClient.post(
         Transaction(Instant.now(),
@@ -103,34 +104,54 @@ case class MixerImpl(
   }
 
   def tradeAddressesForNewDeposit(
-      incomingAddresses: Set[BitcoinAddress]): IO[BitcoinAddress] =
-    IO.pure {
+      incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress] =
+    Task {
       val accountToWatch = generateAddress()
       unconfirmedDeposits.update(accountToWatch, incomingAddresses)
       accountToWatch
     }
 
-  def watch(addr: BitcoinAddress)(
+  def watch(addr: BitcoinAddress,
+            expectedValue: JobCoinValue,
+            incomingAddresses: Set[BitcoinAddress])(
       startTime: Instant,
       timeout: FiniteDuration,
-      interval: FiniteDuration): IO[Option[Transaction]] = {
-    println(timeout.toMillis)
+      interval: FiniteDuration): Task[Option[List[Transaction]]] = {
     if (Instant
           .now()
           .toEpochMilli >= (startTime.toEpochMilli + timeout.toMillis))
-      IO.pure(None)
+      Task(None)
     else
       transactionsClient.get().flatMap { transactions =>
-        transactions.find(_.toAddress == addr) match {
-          case None =>
+        //Assume we can filter for the list of transactions by time after the watch started
+        val addressesWithTransactions = transactions
+          .filter(_.toAddress == addr)
+          .groupBy(_.fromAddress)
+          .filter {
+            case (Some(k), _) => incomingAddresses.contains(k)
+            case _ => false
+          }
+
+        val monitoredTransactions =
+          addressesWithTransactions.values.flatten.toList
+
+        monitoredTransactions match {
+          case Nil =>
             Thread.sleep(interval.toMillis)
-            watch(addr)(Instant.now(), timeout - interval, interval)
-          case trans @ Some(_) => IO.pure(trans)
+            watch(addr, expectedValue, incomingAddresses)(Instant.now(),
+                                                          timeout - interval,
+                                                          interval)
+          case trans if trans.map(_.amount.value).sum < expectedValue.value =>
+            Thread.sleep(interval.toMillis)
+            watch(addr, expectedValue, incomingAddresses)(Instant.now(),
+                                                          timeout - interval,
+                                                          interval)
+          case trans => Task(Some(trans))
         }
       }
   }
 
-  def payout(): IO[Unit] = ???
+  def payout(): Task[Unit] = ???
 
 }
 object Mixer

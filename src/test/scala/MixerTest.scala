@@ -11,8 +11,10 @@ import Mixer._
 import cats._
 import cats.data._
 import cats.implicits._
-import cats.effect.IO
-import hammock.Status.{OK, UnprocessableEntity}
+import monix.eval._
+import monix.cats._
+import monix.execution.Scheduler.Implicits.global
+import pprint._
 
 object FakeData {
 
@@ -33,26 +35,28 @@ object FakeData {
     Transaction(Instant.MIN,
                 BitcoinAddress("to"),
                 Some(BitcoinAddress("from")),
-                JobCoinValue(1))
+                JobCoinValue(1)),
+    Transaction(Instant.now, BitcoinAddress("a"), None, JobCoinValue(100))
   )
 }
 
 case class FakeAddressesClient() extends AddressesClient {
   override def get(
-      addr: BitcoinAddress): IO[(JobCoinValue, List[Transaction])] = IO.pure {
-    val transs = FakeData.transactions.filter(_.toAddress != addr)
+      addr: BitcoinAddress): Task[(JobCoinValue, List[Transaction])] = Task {
+    val transs = FakeData.transactions.filter(_.toAddress == addr)
     (JobCoinValue(transs.map(_.amount.value).sum), transs.toList)
   }
 }
 case class FakeTransactionsClient()(implicit addressesClient: AddressesClient)
     extends TransactionsClient {
-  override def get(): IO[List[Transaction]] =
-    IO.pure(FakeData.transactions.toList)
+  override def get(): Task[List[Transaction]] =
+    Task(FakeData.transactions.toList)
 
-  override def post(transaction: Transaction): IO[Option[Transaction]] = {
-    val moneyThatFromMightHave = transaction.fromAddress
+  override def post(transaction: Transaction): Task[Option[Transaction]] = {
+    val moneyFA = transaction.fromAddress
       .map(addr => addressesClient.get(addr).map(_._1))
-      .sequence: IO[Option[JobCoinValue]]
+
+    val moneyThatFromMightHave = Applicative[Task].sequence(moneyFA)
 
     val fromBalance = moneyThatFromMightHave.map(_.getOrElse(JobCoinValue(0)))
 
@@ -86,36 +90,46 @@ class MixerTest extends AsyncFreeSpec with Matchers {
         Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
       val res = mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
 
-      res.unsafeRunSync() shouldBe BitcoinAddress("fake")
+      res.runAsync.map(_ shouldBe BitcoinAddress("fake"))
     }
     "watching" in {
       val mySetOfAddresses =
         Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
+      val myPromisedValue = JobCoinValue(10)
 
       val getDepositAddress =
         mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
       val watch = for {
         depositAddress <- getDepositAddress
-        watched <- mixer.watch(depositAddress)(Instant.now(),
-                                               10 seconds,
-                                               .5 seconds)
+        watched <- mixer.watch(depositAddress, myPromisedValue, mySetOfAddresses)(Instant.now(),
+                                                                10 seconds,
+                                                                .5 seconds)
       } yield {
         watched
       }
       val completeDeposit = for {
         depositAddress <- getDepositAddress
-        myAccountBalances <- addressesClient.get(mySetOfAddresses.head)
+        myAccountBalances <- addressesClient.get(BitcoinAddress("a"))
         fulfillDeposit <- transactionsClient.post(
-          Transaction(Instant.now(),
+          Transaction(Instant.now,
                       depositAddress,
                       Some(mySetOfAddresses.head),
-                      myAccountBalances._1))
-      } yield fulfillDeposit
+                      JobCoinValue(5 )))
+        fulfillDeposit2 <- transactionsClient.post(
+          Transaction(Instant.now,
+            depositAddress,
+            Some(mySetOfAddresses.head),
+            JobCoinValue(5 )))
+      } yield {
+        fulfillDeposit
+      }
 
-      val d = watch.unsafeToFuture().map(println)
-      completeDeposit.unsafeToFuture().map(println)
+      val watchComputation = watch.runAsync
+      completeDeposit.runAsync
 
-      d.map(_ => true shouldBe true)
+      watchComputation.map{x =>
+        pprintln(x)
+        x should not be 'empty}
 
     }
     "mixing" - {}
