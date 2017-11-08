@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="ivy-report.xsl"?>
+<ivy-report version="1.0">
+	<info
+		organisation="default"
+		module="jobcoin$sources"
+		revision="0.1"
+		conf="runtime-internal"
+		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, pom, scala-tool"
+		date="20171108055529"/>
+	<dependencies>
+		<module organisation="com.pepegar" name="hammock-core_2.12">
+			<revision name="0.7.0" status="release" pubdate="20171023115450" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/pepegar/hammock" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="27">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="4654" time="0" location="/Users/aesa/.ivy2/cache/com.pepegar/hammock-core_2.12/ivy-0.7.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/pepegar/hammock-core_2.12/0.7.0/hammock-core_2.12-0.7.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.7.0" rev-constraint-default="0.7.0" rev-constraint-dynamic="0.7.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="hammock-core_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="13765" time="0" location="/Users/aesa/.ivy2/cache/com.pepegar/hammock-core_2.12/srcs/hammock-core_2.12-0.7.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/com/pepegar/hammock-core_2.12/0.7.0/hammock-core_2.12-0.7.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.tpolecat" name="atto-compat-cats_2.12">
+			<revision name="0.5.2" status="release" pubdate="20170330003949" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/tpolecat/atto" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="23">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<license name="BSD New" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="3023" time="0" location="/Users/aesa/.ivy2/cache/org.tpolecat/atto-compat-cats_2.12/ivy-0.5.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/tpolecat/atto-compat-cats_2.12/0.5.2/atto-compat-cats_2.12-0.5.2.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.5.2" rev-constraint-default="0.5.2" rev-constraint-dynamic="0.5.2" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="atto-compat-cats_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="1018" time="0" location="/Users/aesa/.ivy2/cache/org.tpolecat/atto-compat-cats_2.12/srcs/atto-compat-cats_2.12-0.5.2-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/tpolecat/atto-compat-cats_2.12/0.5.2/atto-compat-cats_2.12-0.5.2-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix-cats_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080451" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="22">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="3306" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix-cats_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix-cats_2.12/2.3.0/monix-cats_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix-cats_2.12" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="6757" time="277" location="/Users/aesa/.ivy2/cache/io.monix/monix-cats_2.12/srcs/monix-cats_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/io/monix/monix-cats_2.12/2.3.0/monix-cats_2.12-2.3.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-reflect">
+			<revision name="2.12.4" status="release" pubdate="20171011032224" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.12.4/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="18">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2825" time="0" location="/Users/aesa/.ivy2/cache/org.scala-lang/scala-reflect/ivy-2.12.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.4/scala-reflect-2.12.4.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.12.4" rev-constraint-default="2.12.4" rev-constraint-dynamic="2.12.4" callerrev="0.1" extra-info.apiURL="http://www.scala-lang.org/api/2.12.4/"/>
+				<artifacts>
+					<artifact name="scala-reflect" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="582957" time="0" location="/Users/aesa/.ivy2/cache/org.scala-lang/scala-reflect/srcs/scala-reflect-2.12.4-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.4/scala-reflect-2.12.4-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.github.mpilquist" name="simulacrum_2.12">
+			<revision name="0.10.0" status="release" pubdate="20161103101330" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://github.com/mpilquist/simulacrum" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="13">
+				<license name="Three-clause BSD-style" url="https://github.com/mpilquist/simulacrum/blob/master/LICENSE"/>
+				<metadata-artifact status="no" details="" size="3140" time="0" location="/Users/aesa/.ivy2/cache/com.github.mpilquist/simulacrum_2.12/ivy-0.10.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/github/mpilquist/simulacrum_2.12/0.10.0/simulacrum_2.12-0.10.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.10.0" rev-constraint-default="0.10.0" rev-constraint-dynamic="0.10.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="simulacrum_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="6576" time="0" location="/Users/aesa/.ivy2/cache/com.github.mpilquist/simulacrum_2.12/srcs/simulacrum_2.12-0.10.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/com/github/mpilquist/simulacrum_2.12/0.10.0/simulacrum_2.12-0.10.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-free_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140922" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="10">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="3220" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-free_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-free_2.12/1.0.0-MF/cats-free_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-free_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="13977" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-free_2.12/srcs/cats-free_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-free_2.12/1.0.0-MF/cats-free_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-effect_2.12">
+			<revision name="0.4" status="release" pubdate="20170729135657" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats-effect" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="9">
+				<license name="Apache-2.0" url="http://www.apache.org/licenses/"/>
+				<metadata-artifact status="no" details="" size="3297" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-effect_2.12/ivy-0.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-effect_2.12/0.4/cats-effect_2.12-0.4.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.4" rev-constraint-default="0.4" rev-constraint-dynamic="0.4" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="cats-effect_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="18639" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-effect_2.12/srcs/cats-effect_2.12-0.4-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-effect_2.12/0.4/cats-effect_2.12-0.4-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-laws_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140938" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="15">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="4231" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-laws_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-laws_2.12/1.0.0-MF/cats-laws_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-laws_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="49103" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-laws_2.12/srcs/cats-laws_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-laws_2.12/1.0.0-MF/cats-laws_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-kernel-laws_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140739" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="25">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="3650" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-kernel-laws_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-kernel-laws_2.12/1.0.0-MF/cats-kernel-laws_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-kernel-laws_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="5343" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-kernel-laws_2.12/srcs/cats-kernel-laws_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-kernel-laws_2.12/1.0.0-MF/cats-kernel-laws_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="catalysts-platform_2.12">
+			<revision name="0.0.5" status="release" pubdate="20161107163451" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/catalysts" extra-info.apiURL="https://typelevel.github.io/catalysts/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="33">
+				<license name="Apache License" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="2993" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/catalysts-platform_2.12/ivy-0.0.5.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/catalysts-platform_2.12/0.0.5/catalysts-platform_2.12-0.0.5.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.0.5" rev-constraint-default="0.0.5" rev-constraint-dynamic="0.0.5" callerrev="0.1" extra-info.apiURL="https://typelevel.github.io/catalysts/api/"/>
+				<artifacts>
+					<artifact name="catalysts-platform_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="663" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/catalysts-platform_2.12/srcs/catalysts-platform_2.12-0.0.5-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/catalysts-platform_2.12/0.0.5/catalysts-platform_2.12-0.0.5-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="catalysts-macros_2.12">
+			<revision name="0.0.5" status="release" pubdate="20161107163435" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/catalysts" extra-info.apiURL="https://typelevel.github.io/catalysts/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="16">
+				<license name="Apache License" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="3286" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/catalysts-macros_2.12/ivy-0.0.5.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/catalysts-macros_2.12/0.0.5/catalysts-macros_2.12-0.0.5.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.0.5" rev-constraint-default="0.0.5" rev-constraint-dynamic="0.0.5" callerrev="0.1" extra-info.apiURL="https://typelevel.github.io/catalysts/api/"/>
+				<artifacts>
+					<artifact name="catalysts-macros_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="1435" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/catalysts-macros_2.12/srcs/catalysts-macros_2.12-0.0.5-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/catalysts-macros_2.12/0.0.5/catalysts-macros_2.12-0.0.5-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-core_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140928" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="20">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="3348" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-core_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-core_2.12/1.0.0-MF/cats-core_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-core_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="147339" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-core_2.12/srcs/cats-core_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-core_2.12/1.0.0-MF/cats-core_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-kernel_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140729" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="17">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="2780" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-kernel_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-kernel_2.12/1.0.0-MF/cats-kernel_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-kernel_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="33268" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-kernel_2.12/srcs/cats-kernel_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-kernel_2.12/1.0.0-MF/cats-kernel_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="cats-macros_2.12">
+			<revision name="1.0.0-MF" status="release" pubdate="20170727140617" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/cats" extra-info.apiURL="http://typelevel.org/cats/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="31">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="2926" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-macros_2.12/ivy-1.0.0-MF.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/cats-macros_2.12/1.0.0-MF/cats-macros_2.12-1.0.0-MF.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0-MF" rev-constraint-default="1.0.0-MF" rev-constraint-dynamic="1.0.0-MF" callerrev="0.1" extra-info.apiURL="http://typelevel.org/cats/api/"/>
+				<artifacts>
+					<artifact name="cats-macros_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="1159" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/cats-macros_2.12/srcs/cats-macros_2.12-1.0.0-MF-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/cats-macros_2.12/1.0.0-MF/cats-macros_2.12-1.0.0-MF-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="machinist_2.12">
+			<revision name="0.6.1" status="release" pubdate="20161029111418" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://github.com/typelevel/machinist" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="28">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="2785" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/machinist_2.12/ivy-0.6.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.6.1" rev-constraint-default="0.6.1" rev-constraint-dynamic="0.6.1" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="machinist_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="3546" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/machinist_2.12/srcs/machinist_2.12-0.6.1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080432" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="8">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="2998" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix_2.12/2.3.0/monix_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix_2.12" type="src" ext="jar" extra-classifier="sources" status="failed" details="" size="0" time="0"/>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix-reactive_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080544" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="14">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="3357" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix-reactive_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix-reactive_2.12/2.3.0/monix-reactive_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix-reactive_2.12" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="314310" time="642" location="/Users/aesa/.ivy2/cache/io.monix/monix-reactive_2.12/srcs/monix-reactive_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/io/monix/monix-reactive_2.12/2.3.0/monix-reactive_2.12-2.3.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.jctools" name="jctools-core">
+			<revision name="2.0.1" status="release" pubdate="20170103093251" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/JCTools" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="19">
+				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="3718" time="0" location="/Users/aesa/.ivy2/cache/org.jctools/jctools-core/ivy-2.0.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/jctools/jctools-core/2.0.1/jctools-core-2.0.1.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.0.1" rev-constraint-default="2.0.1" rev-constraint-dynamic="2.0.1" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="jctools-core" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="153350" time="639" location="/Users/aesa/.ivy2/cache/org.jctools/jctools-core/srcs/jctools-core-2.0.1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/jctools/jctools-core/2.0.1/jctools-core-2.0.1-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix-eval_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080523" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="30">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="3061" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix-eval_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix-eval_2.12/2.3.0/monix-eval_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix-eval_2.12" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="64403" time="317" location="/Users/aesa/.ivy2/cache/io.monix/monix-eval_2.12/srcs/monix-eval_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/io/monix/monix-eval_2.12/2.3.0/monix-eval_2.12-2.3.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix-execution_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080502" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="24">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="3396" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix-execution_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix-execution_2.12/2.3.0/monix-execution_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix-execution_2.12" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="207959" time="626" location="/Users/aesa/.ivy2/cache/io.monix/monix-execution_2.12/srcs/monix-execution_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/io/monix/monix-execution_2.12/2.3.0/monix-execution_2.12-2.3.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.reactivestreams" name="reactive-streams">
+			<revision name="1.0.0" status="release" pubdate="20150429121454" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.reactive-streams.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="34">
+				<license name="CC0" url="http://creativecommons.org/publicdomain/zero/1.0/"/>
+				<metadata-artifact status="no" details="" size="2397" time="0" location="/Users/aesa/.ivy2/cache/org.reactivestreams/reactive-streams/ivy-1.0.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/reactivestreams/reactive-streams/1.0.0/reactive-streams-1.0.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0.0" rev-constraint-default="1.0.0" rev-constraint-dynamic="1.0.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="reactive-streams" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="3130" time="188" location="/Users/aesa/.ivy2/cache/org.reactivestreams/reactive-streams/srcs/reactive-streams-1.0.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/reactivestreams/reactive-streams/1.0.0/reactive-streams-1.0.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="io.monix" name="monix-types_2.12">
+			<revision name="2.3.0" status="release" pubdate="20170503080517" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://monix.io/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="11">
+				<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="3230" time="0" location="/Users/aesa/.ivy2/cache/io.monix/monix-types_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/io/monix/monix-types_2.12/2.3.0/monix-types_2.12-2.3.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="monix-types_2.12" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="24467" time="277" location="/Users/aesa/.ivy2/cache/io.monix/monix-types_2.12/srcs/monix-types_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/io/monix/monix-types_2.12/2.3.0/monix-types_2.12-2.3.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-library">
+			<revision name="2.12.4" status="release" pubdate="20171011030456" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.12.4/" downloaded="false" searched="false" default="false" conf="default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="6">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2653" time="0" location="/Users/aesa/.ivy2/cache/org.scala-lang/scala-library/ivy-2.12.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.4/scala-library-2.12.4.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="2.12.4" rev-constraint-default="2.12.4" rev-constraint-dynamic="2.12.4" callerrev="0.1" extra-info.apiURL="http://www.scala-lang.org/api/2.12.4/"/>
+				<artifacts>
+					<artifact name="scala-library" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="991177" time="0" location="/Users/aesa/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.12.4-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.4/scala-library-2.12.4-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="discipline_2.12">
+			<revision name="0.7.3" status="release" pubdate="20170102070058" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typelevel/discipline" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="5">
+				<license name="MIT" url="http://www.opensource.org/licenses/mit-license.php"/>
+				<metadata-artifact status="no" details="" size="3193" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/discipline_2.12/ivy-0.7.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/discipline_2.12/0.7.3/discipline_2.12-0.7.3.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.7.3" rev-constraint-default="0.7.3" rev-constraint-dynamic="0.7.3" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="discipline_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="4126" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/discipline_2.12/srcs/discipline_2.12-0.7.3-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/discipline_2.12/0.7.3/discipline_2.12-0.7.3-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalacheck" name="scalacheck_2.12">
+			<revision name="1.13.4" status="release" pubdate="20161101101622" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalacheck.org" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="4">
+				<license name="BSD-style" url="http://www.opensource.org/licenses/bsd-license.php"/>
+				<metadata-artifact status="no" details="" size="2797" time="0" location="/Users/aesa/.ivy2/cache/org.scalacheck/scalacheck_2.12/ivy-1.13.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.13.4/scalacheck_2.12-1.13.4.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.13.4" rev-constraint-default="1.13.4" rev-constraint-dynamic="1.13.4" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="scalacheck_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="53555" time="0" location="/Users/aesa/.ivy2/cache/org.scalacheck/scalacheck_2.12/srcs/scalacheck_2.12-1.13.4-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.13.4/scalacheck_2.12-1.13.4-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-sbt" name="test-interface">
+			<revision name="1.0" status="release" pubdate="20130628184435" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-sbt.org" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="29">
+				<license name="BSD" url="https://github.com/sbt/test-interface/blob/master/LICENSE"/>
+				<metadata-artifact status="no" details="" size="2710" time="0" location="/Users/aesa/.ivy2/cache/org.scala-sbt/test-interface/ivy-1.0.xml" searched="false" origin-is-local="false" origin-location="file:////Users/aesa/.sbt/preloaded/org.scala-sbt/test-interface/1.0/ivys/ivy.xml"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.0" rev-constraint-default="1.0" rev-constraint-dynamic="1.0" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="test-interface" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="18792" time="0" location="/Users/aesa/.ivy2/cache/org.scala-sbt/test-interface/srcs/test-interface-1.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.apache.httpcomponents" name="httpclient">
+			<revision name="4.5.2" status="release" pubdate="20160221110550" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://hc.apache.org/httpcomponents-client" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="2">
+				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="9802" time="0" location="/Users/aesa/.ivy2/cache/org.apache.httpcomponents/httpclient/ivy-4.5.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="4.5.2" rev-constraint-default="4.5.2" rev-constraint-dynamic="4.5.2" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="httpclient" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="707899" time="0" location="/Users/aesa/.ivy2/cache/org.apache.httpcomponents/httpclient/srcs/httpclient-4.5.2-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="commons-codec" name="commons-codec">
+			<revision name="1.9" status="release" pubdate="20131220225739" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://commons.apache.org/proper/commons-codec/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="3">
+				<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="10097" time="0" location="/Users/aesa/.ivy2/cache/commons-codec/commons-codec/ivy-1.9.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/commons-codec/commons-codec/1.9/commons-codec-1.9.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.9" rev-constraint-default="1.9" rev-constraint-dynamic="1.9" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="commons-codec" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="278370" time="0" location="/Users/aesa/.ivy2/cache/commons-codec/commons-codec/srcs/commons-codec-1.9-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.apache.httpcomponents" name="httpcore">
+			<revision name="4.4.4" status="release" pubdate="20151026131814" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://hc.apache.org/httpcomponents-core-ga" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="7">
+				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="7705" time="0" location="/Users/aesa/.ivy2/cache/org.apache.httpcomponents/httpcore/ivy-4.4.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="4.4.4" rev-constraint-default="4.4.4" rev-constraint-dynamic="4.4.4" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="httpcore" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="405277" time="0" location="/Users/aesa/.ivy2/cache/org.apache.httpcomponents/httpcore/srcs/httpcore-4.4.4-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="commons-logging" name="commons-logging">
+			<revision name="1.2" status="release" pubdate="20140705141228" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://commons.apache.org/proper/commons-logging/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="12">
+				<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="11623" time="0" location="/Users/aesa/.ivy2/cache/commons-logging/commons-logging/ivy-1.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.2" rev-constraint-default="1.2" rev-constraint-dynamic="1.2" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="commons-logging" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="73295" time="0" location="/Users/aesa/.ivy2/cache/commons-logging/commons-logging/srcs/commons-logging-1.2-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.tpolecat" name="atto-core_2.12">
+			<revision name="0.5.2" status="release" pubdate="20170330003937" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/tpolecat/atto" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="1">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<license name="BSD New" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="2711" time="0" location="/Users/aesa/.ivy2/cache/org.tpolecat/atto-core_2.12/ivy-0.5.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/tpolecat/atto-core_2.12/0.5.2/atto-core_2.12-0.5.2.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="0.5.2" rev-constraint-default="0.5.2" rev-constraint-dynamic="0.5.2" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="atto-core_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="13643" time="0" location="/Users/aesa/.ivy2/cache/org.tpolecat/atto-core_2.12/srcs/atto-core_2.12-0.5.2-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/tpolecat/atto-core_2.12/0.5.2/atto-core_2.12-0.5.2-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.github.julien-truffaut" name="monocle-macro_2.12">
+			<revision name="1.4.0" status="release" pubdate="20170114175022" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/julien-truffaut/Monocle" extra-info.apiURL="https://julien-truffaut.github.io/Monocle/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="0">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="3440" time="0" location="/Users/aesa/.ivy2/cache/com.github.julien-truffaut/monocle-macro_2.12/ivy-1.4.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/github/julien-truffaut/monocle-macro_2.12/1.4.0/monocle-macro_2.12-1.4.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.4.0" rev-constraint-default="1.4.0" rev-constraint-dynamic="1.4.0" callerrev="0.1" extra-info.apiURL="https://julien-truffaut.github.io/Monocle/api/"/>
+				<artifacts>
+					<artifact name="monocle-macro_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="7365" time="0" location="/Users/aesa/.ivy2/cache/com.github.julien-truffaut/monocle-macro_2.12/srcs/monocle-macro_2.12-1.4.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/com/github/julien-truffaut/monocle-macro_2.12/1.4.0/monocle-macro_2.12-1.4.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.typelevel" name="macro-compat_2.12">
+			<revision name="1.1.1" status="release" pubdate="20161102044258" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/milessabin/macro-compat" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="21">
+				<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="2964" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/macro-compat_2.12/ivy-1.1.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.1.1" rev-constraint-default="1.1.1" rev-constraint-dynamic="1.1.1" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="macro-compat_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="1052" time="0" location="/Users/aesa/.ivy2/cache/org.typelevel/macro-compat_2.12/srcs/macro-compat_2.12-1.1.1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.github.julien-truffaut" name="monocle-core_2.12">
+			<revision name="1.4.0" status="release" pubdate="20170114175000" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/julien-truffaut/Monocle" extra-info.apiURL="https://julien-truffaut.github.io/Monocle/api/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="26">
+				<license name="MIT" url="http://opensource.org/licenses/MIT"/>
+				<metadata-artifact status="no" details="" size="2971" time="0" location="/Users/aesa/.ivy2/cache/com.github.julien-truffaut/monocle-core_2.12/ivy-1.4.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/github/julien-truffaut/monocle-core_2.12/1.4.0/monocle-core_2.12-1.4.0.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="1.4.0" rev-constraint-default="1.4.0" rev-constraint-dynamic="1.4.0" callerrev="0.1" extra-info.apiURL="https://julien-truffaut.github.io/Monocle/api/"/>
+				<artifacts>
+					<artifact name="monocle-core_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="62387" time="0" location="/Users/aesa/.ivy2/cache/com.github.julien-truffaut/monocle-core_2.12/srcs/monocle-core_2.12-1.4.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/com/github/julien-truffaut/monocle-core_2.12/1.4.0/monocle-core_2.12-1.4.0-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalaz" name="scalaz-core_2.12">
+			<revision name="7.2.8" status="release" pubdate="20161203080121" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://scalaz.org" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="32">
+				<license name="BSD-style" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="2639" time="0" location="/Users/aesa/.ivy2/cache/org.scalaz/scalaz-core_2.12/ivy-7.2.8.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.8/scalaz-core_2.12-7.2.8.pom"/>
+				<caller organisation="default" name="jobcoin$sources" conf="compile, runtime-internal, runtime, optional" rev="7.2.8" rev-constraint-default="7.2.8" rev-constraint-dynamic="7.2.8" callerrev="0.1"/>
+				<artifacts>
+					<artifact name="scalaz-core_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="366624" time="0" location="/Users/aesa/.ivy2/cache/org.scalaz/scalaz-core_2.12/srcs/scalaz-core_2.12-7.2.8-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.8/scalaz-core_2.12-7.2.8-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+	</dependencies>
+</ivy-report>
