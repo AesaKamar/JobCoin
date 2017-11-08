@@ -1,9 +1,0 @@
-reload
-compile
-jobcoin/compile
-~compile
-~test
-reload
-~test
-test
-~test
