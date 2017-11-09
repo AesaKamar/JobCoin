@@ -57,12 +57,15 @@ trait Mixer {
 }
 
 /**
-  * You provide  a list of new, unused addresses that you own to the mixer;
-  * The mixer provides you with a new deposit address that it owns;
-  * You transfer your bitcoins to that address;
-  * The mixer will detect your transfer by watching or polling the P2P Bitcoin network;
-  * The mixer will transfer your bitcoin from the deposit address into a big “house account” along with all the other bitcoin currently being mixed; and
-  * Then, over some time the mixer will use the house account to dole out your bitcoin in smaller increments to the withdrawal addresses that you provided, possibly after deducting a fee.
+  * 1) You provide  a list of new, unused addresses that you own to the mixer;
+  * 2) The mixer provides you with a new deposit address that it owns;
+  * 3) You transfer your bitcoins to that address;
+  * 4) The mixer will detect your transfer by watching or polling the P2P Bitcoin network;
+  * 5) The mixer will transfer your bitcoin from the deposit address into a big “house account”
+  *   along with all the other bitcoin currently being mixed
+  * 6) Then, over some time the mixer will use the house account to dole out your bitcoin
+  *   in smaller increments to the withdrawal addresses that you provided,
+  *   possibly after deducting a fee.
   */
 case class MixerImpl(
     remainingPayouts: mutable.Map[Set[BitcoinAddress], JobCoinValue],
@@ -75,34 +78,10 @@ case class MixerImpl(
 
   lazy val houseAddress: BitcoinAddress = generateAddress()
 
-  def doMix(incomingAddresses: Set[BitcoinAddress]): Task[Option[Unit]] = {
-
-    val res = for {
-      depositAddress <- tradeAddressesForNewDeposit(incomingAddresses)
-      depositStatus <- watch(depositAddress, ???, incomingAddresses)(
-        Instant.now(),
-        30 seconds,
-        3 seconds)
-      deposit <- addressesClient.get(depositAddress)
-      transferToHouseAccount <- transactionsClient.post(
-        Transaction(Instant.now(),
-                    houseAddress,
-                    Some(depositAddress),
-                    deposit._1))
-
-    } yield {
-      for {
-        _ <- depositStatus
-        _ <- transferToHouseAccount
-        _ <- unconfirmedDeposits.remove(depositAddress)
-      } yield {
-        mixerOwnedAddresses.add(depositAddress)
-        remainingPayouts.update(incomingAddresses, deposit._1)
-      }
-    }
-    res
-  }
-
+  /**
+    * 1) You provide  a list of new, unused addresses that you own to the mixer;
+    * 2) The mixer provides you with a new deposit address that it owns;
+    */
   def tradeAddressesForNewDeposit(
       incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress] =
     Task {
@@ -111,9 +90,14 @@ case class MixerImpl(
       accountToWatch
     }
 
-  def watch(addr: BitcoinAddress,
-            expectedValue: JobCoinValue,
-            incomingAddresses: Set[BitcoinAddress])(
+  /**
+    * 4) The mixer will detect your transfer by watching or polling the P2P Bitcoin network;
+    * 5) The mixer will transfer your bitcoin from the deposit address into a big “house account”
+    *   along with all the other bitcoin currently being mixed
+    */
+  def watchForDepositFromAddresses(watchedAddress: BitcoinAddress,
+                                   expectedValue: JobCoinValue,
+                                   incomingAddresses: Set[BitcoinAddress])(
       startTime: Instant,
       timeout: FiniteDuration,
       interval: FiniteDuration): Task[Option[List[Transaction]]] = {
@@ -125,11 +109,11 @@ case class MixerImpl(
       transactionsClient.get().flatMap { transactions =>
         //Assume we can filter for the list of transactions by time after the watch started
         val addressesWithTransactions = transactions
-          .filter(_.toAddress == addr)
+          .filter(_.toAddress == watchedAddress)
           .groupBy(_.fromAddress)
           .filter {
             case (Some(k), _) => incomingAddresses.contains(k)
-            case _ => false
+            case _            => false
           }
 
         val monitoredTransactions =
@@ -138,14 +122,16 @@ case class MixerImpl(
         monitoredTransactions match {
           case Nil =>
             Thread.sleep(interval.toMillis)
-            watch(addr, expectedValue, incomingAddresses)(Instant.now(),
-                                                          timeout - interval,
-                                                          interval)
+            watchForDepositFromAddresses(
+              watchedAddress,
+              expectedValue,
+              incomingAddresses)(Instant.now(), timeout - interval, interval)
           case trans if trans.map(_.amount.value).sum < expectedValue.value =>
             Thread.sleep(interval.toMillis)
-            watch(addr, expectedValue, incomingAddresses)(Instant.now(),
-                                                          timeout - interval,
-                                                          interval)
+            watchForDepositFromAddresses(
+              watchedAddress,
+              expectedValue,
+              incomingAddresses)(Instant.now(), timeout - interval, interval)
           case trans => Task(Some(trans))
         }
       }
