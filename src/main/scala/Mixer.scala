@@ -131,12 +131,10 @@ case class MixerImpl(
             case (Some(k), _) => incomingAddresses.contains(k)
             case _ => false
           }
-        pprintln(transactions)
 
         val monitoredTransactions =
           addressesWithTransactions.values.flatten.toList
 
-//        pprintln(monitoredTransactions)
         monitoredTransactions match {
           case Nil =>
             Thread.sleep(interval.toMillis)

@@ -1,6 +1,7 @@
 import java.time.Instant
 
-import org.scalatest.{AsyncFreeSpec, BeforeAndAfterEach, FreeSpec, Matchers}
+import org.scalatest._
+import org.scalatest.OptionValues._
 import scala.concurrent.duration._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -43,8 +44,13 @@ object FakeData {
 case class FakeAddressesClient() extends AddressesClient {
   override def get(
       addr: BitcoinAddress): Task[(JobCoinValue, List[Transaction])] = Task {
-    val transs = FakeData.transactions.filter(_.toAddress == addr)
-    (JobCoinValue(transs.map(_.amount.value).sum), transs.toList)
+
+    val transactions = FakeData.transactions
+      .filter(_.toAddress == addr)
+
+    val balance = transactions.map(_.amount.value).sum
+
+    (JobCoinValue(balance), transactions.toList)
   }
 }
 case class FakeTransactionsClient private (
@@ -55,15 +61,17 @@ case class FakeTransactionsClient private (
     Task(transactions.toList)
 
   override def post(transaction: Transaction): Task[Option[Transaction]] = {
-    val moneyFA = transaction.fromAddress
-      .map(addr => addressesClient.get(addr).map(_._1))
 
-    val moneyThatFromMightHave = Applicative[Task].sequence(moneyFA)
+    val maybeFromInformation = transaction.fromAddress
+      .map(addressesClient.get)
 
-    val fromBalance = moneyThatFromMightHave.map(_.getOrElse(JobCoinValue(Double.MaxValue)))
+    val fromBalance = maybeFromInformation match {
+      case Some(t) => t.map { case (balance, history) => balance }
+      case None    => Task(JobCoinValue(Double.MaxValue))
+    }
 
-    fromBalance.map { bal =>
-      if (bal.value - transaction.amount.value >= 0) {
+    fromBalance.map { balance =>
+      if (balance.value >= transaction.amount.value) {
         transactions.append(transaction)
         Some(transaction)
       } else None
@@ -76,169 +84,150 @@ case class FakeTransactionsClient private (
 
 class MixerTest extends AsyncFreeSpec with Matchers {
 
-  "transaction client should update" in {
+  type Dependencies[A] =
+    (() => BitcoinAddress, AddressesClient, TransactionsClient, MixerImpl) => A
+  type AssertionOperation = (Any => Future[Assertion])
+
+  /**
+    *
+    * @param op A block which returns an [[A]]
+    * @tparam A The return type of the operation
+    * @return A closure with bound context to the variables
+    */
+  def runWithDependencies[A](op: Dependencies[A]) = {
+    val addressGenerator = () => BitcoinAddress("fake")
     implicit val addressesClient: AddressesClient = FakeAddressesClient()
     implicit val transactionsClient: TransactionsClient =
       FakeTransactionsClient(FakeData.transactions)
 
-    val time = Instant.now
-    val trans =
-      Transaction(time, BitcoinAddress("client"), None, JobCoinValue(5))
-    val comp = for {
-      put <- transactionsClient.post(trans)
-      get <- transactionsClient.get()
-    } yield {
-      put.get shouldEqual trans
-      get should contain(trans)
-    }
+    val mixer = MixerImpl(mutable.Map.empty,
+                          mutable.Map.empty,
+                          mutable.Set.empty)(addressGenerator)
 
-    comp.runAsync
+    op(addressGenerator, addressesClient, transactionsClient, mixer)
   }
 
-  "With a Mixer Impl" - {
+  "transaction client should update" in runWithDependencies {
+    (addressGenerator, addressesClient, transactionsClient, mixer) =>
+      val trans =
+        Transaction(Instant.now,
+                    BitcoinAddress("client"),
+                    None,
+                    JobCoinValue(5))
 
-    "trading" in {
-      val addressGenerator = () => BitcoinAddress("fake")
-      implicit val addressesClient: AddressesClient = FakeAddressesClient()
-      implicit val transactionsClient: TransactionsClient =
-        FakeTransactionsClient(FakeData.transactions)
+      val computation = for {
+        put <- transactionsClient.post(trans)
+        get <- transactionsClient.get()
+      } yield {
+        put.value shouldEqual trans
+        get should contain(trans)
+      }
 
-      val mixer = MixerImpl(mutable.Map.empty,
-                            mutable.Map.empty,
-                            mutable.Set.empty)(addressGenerator)
+      computation.runAsync
+  }
 
-      val mySetOfAddresses =
-        Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
-      val res = mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+  "For out [[Mixer Impl]]" - {
 
-      res.runAsync.map(_ shouldBe BitcoinAddress("fake"))
+    val mySetOfAddresses =
+      Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
+    val myPromisedValue = JobCoinValue(10)
+
+    "trading" in runWithDependencies {
+      (addressGenerator, addressesClient, transactionsClient, mixer) =>
+        val mySetOfAddresses =
+          Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
+        val res = mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+
+        res.runAsync.map(_ shouldBe BitcoinAddress("fake"))
     }
+
     "watching" - {
 
-      "with a completed deposit should pass" in {
-        val addressGenerator = () => BitcoinAddress("fake")
-        implicit val addressesClient: AddressesClient = FakeAddressesClient()
-        implicit val transactionsClient: TransactionsClient =
-          FakeTransactionsClient(FakeData.transactions)
+      "with a completed deposit, watch should pass" in runWithDependencies {
+        (addressGenerator, addressesClient, transactionsClient, mixer) =>
+          val getDepositAddress =
+            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
 
-        val mixer = MixerImpl(mutable.Map.empty,
-                              mutable.Map.empty,
-                              mutable.Set.empty)(addressGenerator)
-        val mySetOfAddresses =
-          Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
-        val myPromisedValue = JobCoinValue(10)
+          val watch = for {
+            depositAddress <- getDepositAddress
+            watched <- mixer.watch(depositAddress,
+                                   myPromisedValue,
+                                   mySetOfAddresses)(Instant.now(),
+                                                     2 seconds,
+                                                     .1 seconds)
+          } yield watched
 
-        val getDepositAddress =
-          mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
-        val watch = for {
-          depositAddress <- getDepositAddress
-          watched <- mixer.watch(
-            depositAddress,
-            myPromisedValue,
-            mySetOfAddresses)(Instant.now(), 10 seconds, .5 seconds)
-        } yield {
-          watched
-        }
+          val completeDeposit = for {
+            depositAddress <- getDepositAddress
+            myAccountBalances <- addressesClient.get(mySetOfAddresses.head)
+            fulfillDeposit <- transactionsClient.post(
+              Transaction(Instant.now,
+                          depositAddress,
+                          Some(mySetOfAddresses.head),
+                          JobCoinValue(5)))
+            fulfillDeposit2 <- transactionsClient.post(
+              Transaction(Instant.now,
+                          depositAddress,
+                          Some(mySetOfAddresses.head),
+                          JobCoinValue(5)))
+          } yield fulfillDeposit
 
-        val completeDeposit = for {
-          depositAddress <- getDepositAddress
-          myAccountBalances <- addressesClient.get(BitcoinAddress("a"))
-          fulfillDeposit <- transactionsClient.post(
-            Transaction(Instant.now,
-                        depositAddress,
-                        Some(mySetOfAddresses.head),
-                        JobCoinValue(5)))
-          fulfillDeposit2 <- transactionsClient.post(
-            Transaction(Instant.now,
-                        depositAddress,
-                        Some(mySetOfAddresses.head),
-                        JobCoinValue(5)))
-        } yield {
+          val watchComputation = watch.runAsync
+          completeDeposit.runAsync
 
-          fulfillDeposit
-        }
-
-        val watchComputation = watch.runAsync
-        completeDeposit.runAsync
-
-        watchComputation.map { x =>
-          x should not be 'empty
-        }
+          watchComputation.map { x =>
+            x should not be 'empty
+          }
       }
-      "with a partially completed deposit should fail" in {
-        val addressGenerator = () => BitcoinAddress("fake")
-        implicit val addressesClient: AddressesClient = FakeAddressesClient()
-        implicit val transactionsClient: TransactionsClient =
-          FakeTransactionsClient(FakeData.transactions)
+      "with a partially completed deposit, watch should fail" in runWithDependencies {
+        (addressGenerator, addressesClient, transactionsClient, mixer) =>
+          val getDepositAddress =
+            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
 
-        val mixer = MixerImpl(mutable.Map.empty,
-                              mutable.Map.empty,
-                              mutable.Set.empty)(addressGenerator)
-        val mySetOfAddresses =
-          Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
-        val myPromisedValue = JobCoinValue(10)
+          val watch = for {
+            depositAddress <- getDepositAddress
+            watched <- mixer.watch(depositAddress,
+                                   myPromisedValue,
+                                   mySetOfAddresses)(Instant.now(),
+                                                     .5 seconds,
+                                                     .1 seconds)
+          } yield watched
 
-        val getDepositAddress =
-          mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
-        val watch = for {
-          depositAddress <- getDepositAddress
-          watched <- mixer.watch(
-            depositAddress,
-            myPromisedValue,
-            mySetOfAddresses)(Instant.now(), 1 seconds, .5 seconds)
-        } yield {
-          watched
-        }
+          val completeDeposit = for {
+            depositAddress <- getDepositAddress
+            myAccountBalances <- addressesClient.get(mySetOfAddresses.head)
+            fulfillDeposit <- transactionsClient.post(
+              Transaction(Instant.now,
+                          depositAddress,
+                          Some(mySetOfAddresses.head),
+                          JobCoinValue(5)))
+          } yield fulfillDeposit
 
-        val completeDeposit = for {
-          depositAddress <- getDepositAddress
-          myAccountBalances <- addressesClient.get(BitcoinAddress("a"))
-          fulfillDeposit <- transactionsClient.post(
-            Transaction(Instant.now,
-                        depositAddress,
-                        Some(mySetOfAddresses.head),
-                        JobCoinValue(5)))
-        } yield {
-          fulfillDeposit
-        }
+          val watchComputation = watch.runAsync
+          completeDeposit.runAsync
 
-        val watchComputation = watch.runAsync
-        completeDeposit.runAsync
-
-        watchComputation.map { x =>
-          x shouldBe 'empty
-        }
+          watchComputation.map { x =>
+            x shouldBe 'empty
+          }
       }
-      "with no completed deposit should fail" in {
-        val addressGenerator = () => BitcoinAddress("fake")
-        implicit val addressesClient: AddressesClient = FakeAddressesClient()
-        implicit val transactionsClient: TransactionsClient =
-          FakeTransactionsClient(FakeData.transactions)
+      "with no completed deposit, watch should fail" in runWithDependencies {
+        (addressGenerator, addressesClient, transactionsClient, mixer) =>
+          val getDepositAddress =
+            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+          val watch = for {
+            depositAddress <- getDepositAddress
+            watched <- mixer.watch(depositAddress,
+                                   myPromisedValue,
+                                   mySetOfAddresses)(Instant.now(),
+                                                     .5 seconds,
+                                                     .1 seconds)
+          } yield watched
 
-        val mixer = MixerImpl(mutable.Map.empty,
-                              mutable.Map.empty,
-                              mutable.Set.empty)(addressGenerator)
-        val mySetOfAddresses =
-          Set(BitcoinAddress("a"), BitcoinAddress("b"), BitcoinAddress("c"))
-        val myPromisedValue = JobCoinValue(10)
+          val watchComputation = watch.runAsync
 
-        val getDepositAddress =
-          mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
-        val watch = for {
-          depositAddress <- getDepositAddress
-          watched <- mixer.watch(
-            depositAddress,
-            myPromisedValue,
-            mySetOfAddresses)(Instant.now(), 1 seconds, .5 seconds)
-        } yield {
-          watched
-        }
-
-        val watchComputation = watch.runAsync
-
-        watchComputation.map { x =>
-          x shouldBe 'empty
-        }
+          watchComputation.map { x =>
+            x shouldBe 'empty
+          }
       }
 
     }
