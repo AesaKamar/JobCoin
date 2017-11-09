@@ -54,6 +54,13 @@ trait Mixer {
 
   def tradeAddressesForNewDeposit(
       incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress]
+
+  def watchForDepositFromAddresses(watchedAddress: BitcoinAddress,
+                                   expectedValue: JobCoinValue,
+                                   incomingAddresses: Set[BitcoinAddress])(
+      startTime: Instant,
+      timeout: FiniteDuration,
+      interval: FiniteDuration): Task[Option[List[Transaction]]]
 }
 
 /**
