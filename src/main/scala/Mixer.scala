@@ -3,13 +3,12 @@ import java.util.UUID
 
 import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Random, Success}
 
 import cats._
 import cats.data._
 import cats.implicits._
 import monix.eval._
-
 import pprint._
 
 //======================
@@ -55,12 +54,18 @@ trait Mixer {
   def tradeAddressesForNewDepositAddress(
       incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress]
 
-  def watchForDepositFromAddresses(watchedAddress: BitcoinAddress,
-                                   expectedValue: JobCoinValue,
-                                   incomingAddresses: Set[BitcoinAddress])(
+  def watchForDepositFromAddresses(
+      mixerOwnedDepositAddress: BitcoinAddress,
+      expectedValue: JobCoinValue,
+      userProvidedWithdrawalAddresses: Set[BitcoinAddress])(
       startTime: Instant,
       timeout: FiniteDuration,
       interval: FiniteDuration): Task[Option[List[Transaction]]]
+
+  def payoutLongRunningTask(
+      scheduler: (Instant) => FiniteDuration,
+      disburser: (JobCoinValue) => JobCoinValue): Task[Unit]
+
 }
 
 /**
@@ -102,9 +107,10 @@ case class MixerImpl(
     * 5) The mixer will transfer your bitcoin from the deposit address into a big “house account”
     *   along with all the other bitcoin currently being mixed
     */
-  def watchForDepositFromAddresses(watchedDepositAddress: BitcoinAddress,
-                                   expectedValue: JobCoinValue,
-                                   userProvidedAddresses: Set[BitcoinAddress])(
+  def watchForDepositFromAddresses(
+      mixerOwnedDepositAddress: BitcoinAddress,
+      expectedValue: JobCoinValue,
+      userProvidedWithdrawalAddresses: Set[BitcoinAddress])(
       startTime: Instant,
       timeout: FiniteDuration,
       interval: FiniteDuration): Task[Option[List[Transaction]]] = {
@@ -115,24 +121,24 @@ case class MixerImpl(
     else
       transactionsClient.get().flatMap { allTransactions =>
         val addressesWithTransactions = allTransactions
-          .filter(_.toAddress == watchedDepositAddress)
+          .filter(_.toAddress == mixerOwnedDepositAddress)
           .groupBy(_.fromAddress)
 
-        val addressesInIncomingWithTransactions = addressesWithTransactions
-          .filter {
-            case (Some(fromAddr), _) => userProvidedAddresses.contains(fromAddr)
-            case _                   => false
-          }
+//        val addressesInIncomingWithTransactions = addressesWithTransactions
+//          .filter {
+//            case (Some(fromAddr), _) => userProvidedWithdrawalAddresses.contains(fromAddr)
+//            case _                   => false
+//          }
 
         val monitoredTransactions =
-          addressesInIncomingWithTransactions.values.flatten.toList
+          addressesWithTransactions.values.flatten.toList
 
         monitoredTransactions match {
           case Nil =>
             Thread.sleep(interval.toMillis)
-            watchForDepositFromAddresses(watchedDepositAddress,
+            watchForDepositFromAddresses(mixerOwnedDepositAddress,
                                          expectedValue,
-                                         userProvidedAddresses)(
+                                         userProvidedWithdrawalAddresses)(
               Instant.now(),
               timeout - interval,
               interval)
@@ -140,17 +146,18 @@ case class MixerImpl(
           case transactions
               if transactions.map(_.amount.value).sum < expectedValue.value =>
             Thread.sleep(interval.toMillis)
-            watchForDepositFromAddresses(watchedDepositAddress,
+            watchForDepositFromAddresses(mixerOwnedDepositAddress,
                                          expectedValue,
-                                         userProvidedAddresses)(
+                                         userProvidedWithdrawalAddresses)(
               Instant.now(),
               timeout - interval,
               interval)
 
           case transactionsSummingToExpectedValue => {
-            unconfirmedDeposits.remove(watchedDepositAddress)
+            unconfirmedDeposits.remove(mixerOwnedDepositAddress)
+            mixerOwnedAddresses.add(mixerOwnedDepositAddress)
             remainingPayouts.update(
-              userProvidedAddresses,
+              userProvidedWithdrawalAddresses,
               JobCoinValue(
                 transactionsSummingToExpectedValue.map(_.amount.value).sum))
             Task(Some(transactionsSummingToExpectedValue))
@@ -164,13 +171,47 @@ case class MixerImpl(
     *   in smaller increments to the withdrawal addresses that you provided,
     *   possibly after deducting a fee.
     */
-  def payoutLongRunning(
+  def payoutLongRunningTask(
       scheduler: (Instant) => FiniteDuration,
       disburser: (JobCoinValue) => JobCoinValue): Task[Unit] = {
 
-    remainingPayouts
-    ???
+    val scheduledDisbursementTasks = remainingPayouts.map {
+      case (addresses, remainingPayout) if remainingPayout.value <= 0 =>
+        Task.unit
+      case (addresses, remainingPayout) =>
+        val amountToDisburse = disburser(remainingPayout)
+        val addressToDisburseTo = Mixer.random(addresses)
+
+        val transaction = Transaction(Instant.now(),
+                                      addressToDisburseTo,
+                                      Some(houseAddress),
+                                      amountToDisburse)
+
+        for {
+          goToSleep <- Task {
+            val howLongFromNowToExecute = scheduler(Instant.now).toMillis
+            Thread.sleep(howLongFromNowToExecute)
+          }
+          transactionResult <- transactionsClient.post(transaction)
+        } yield
+          transactionResult match {
+            case Some(tr) =>
+              remainingPayouts.update(
+                addresses,
+                JobCoinValue(remainingPayout.value - tr.amount.value))
+            case None => ()
+          }
+    }
+
+    Task
+      .sequence(scheduledDisbursementTasks)
+      .flatMap(_ => payoutLongRunningTask(scheduler, disburser))
   }
 
 }
-object Mixer
+object Mixer {
+  def random[T](s: Set[T]): T = {
+    val n = util.Random.nextInt(s.size)
+    s.iterator.drop(n).next
+  }
+}
