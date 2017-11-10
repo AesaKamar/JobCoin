@@ -9,6 +9,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import monix.eval._
+import monix.cats._
 import pprint._
 
 //======================
@@ -62,9 +63,9 @@ trait Mixer {
       timeout: FiniteDuration,
       interval: FiniteDuration): Task[Option[List[Transaction]]]
 
-  def payoutLongRunningTask(
+  def payoutSingle(
       scheduler: (Instant) => FiniteDuration,
-      disburser: (JobCoinValue) => JobCoinValue): Task[Unit]
+      disburser: (JobCoinValue) => JobCoinValue): Task[Seq[Option[Transaction]]]
 
 }
 
@@ -171,13 +172,15 @@ case class MixerImpl(
     *   in smaller increments to the withdrawal addresses that you provided,
     *   possibly after deducting a fee.
     */
-  def payoutLongRunningTask(
-      scheduler: (Instant) => FiniteDuration,
-      disburser: (JobCoinValue) => JobCoinValue): Task[Unit] = {
+  def payoutSingle(scheduler: (Instant) => FiniteDuration,
+                   disburser: (JobCoinValue) => JobCoinValue)
+    : Task[Seq[Option[Transaction]]] = {
 
-    val scheduledDisbursementTasks = remainingPayouts.map {
+    val scheduledDisbursementTasks
+      : mutable.Iterable[Task[Option[Transaction]]] = remainingPayouts.map {
       case (addresses, remainingPayout) if remainingPayout.value <= 0 =>
-        Task.unit
+//        remainingPayouts.remove(addresses)
+        Task(None)
       case (addresses, remainingPayout) =>
         val amountToDisburse = disburser(remainingPayout)
         val addressToDisburseTo = Mixer.random(addresses)
@@ -188,24 +191,26 @@ case class MixerImpl(
                                       amountToDisburse)
 
         for {
-          goToSleep <- Task {
-            val howLongFromNowToExecute = scheduler(Instant.now).toMillis
-            Thread.sleep(howLongFromNowToExecute)
-          }
           transactionResult <- transactionsClient.post(transaction)
-        } yield
+        } yield {
           transactionResult match {
-            case Some(tr) =>
+            case s @ Some(tr) =>
               remainingPayouts.update(
                 addresses,
                 JobCoinValue(remainingPayout.value - tr.amount.value))
-            case None => ()
+              s
+            case None =>
+              None
           }
+        }
     }
 
-    Task
-      .sequence(scheduledDisbursementTasks)
-      .flatMap(_ => payoutLongRunningTask(scheduler, disburser))
+    if (scheduledDisbursementTasks.isEmpty)
+      println("payouts empty")
+    else println("payouts remaining")
+
+    Task.sequence(scheduledDisbursementTasks.toSeq)
+
   }
 
 }
