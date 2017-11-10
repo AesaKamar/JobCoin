@@ -141,7 +141,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
       "should generate an appropriate depoosit address" in runWithDependencies {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
 
-          val res = mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+          val res = mixer.tradeAddressesForNewDepositAddress(mySetOfAddresses)
 
           res.runAsync.map(_ shouldBe BitcoinAddress("fake"))
       }
@@ -152,7 +152,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
       "with a completed deposit, watch should pass" in runWithDependencies {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           val getDepositAddressTask =
-            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+            mixer.tradeAddressesForNewDepositAddress(mySetOfAddresses)
 
           val watchTask = for {
             depositAddress <- getDepositAddressTask
@@ -187,7 +187,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
       "with a partially completed deposit, watch should fail" in runWithDependencies {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           val getDepositAddressTask =
-            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+            mixer.tradeAddressesForNewDepositAddress(mySetOfAddresses)
 
           val watchTask = for {
             depositAddress <- getDepositAddressTask
@@ -217,7 +217,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
       "with no completed deposit, watch should fail" in runWithDependencies {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           val getDepositAddressTask =
-            mixer.tradeAddressesForNewDeposit(mySetOfAddresses)
+            mixer.tradeAddressesForNewDepositAddress(mySetOfAddresses)
 
           val watchTask = for {
             depositAddress <- getDepositAddressTask

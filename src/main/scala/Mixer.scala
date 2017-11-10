@@ -52,7 +52,7 @@ trait Mixer {
 
   def houseAddress: BitcoinAddress
 
-  def tradeAddressesForNewDeposit(
+  def tradeAddressesForNewDepositAddress(
       incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress]
 
   def watchForDepositFromAddresses(watchedAddress: BitcoinAddress,
@@ -89,7 +89,7 @@ case class MixerImpl(
     * 1) You provide  a list of new, unused addresses that you own to the mixer;
     * 2) The mixer provides you with a new deposit address that it owns;
     */
-  def tradeAddressesForNewDeposit(
+  def tradeAddressesForNewDepositAddress(
       incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress] =
     Task {
       val accountToWatch = generateAddress()
@@ -102,9 +102,9 @@ case class MixerImpl(
     * 5) The mixer will transfer your bitcoin from the deposit address into a big “house account”
     *   along with all the other bitcoin currently being mixed
     */
-  def watchForDepositFromAddresses(watchedAddress: BitcoinAddress,
+  def watchForDepositFromAddresses(watchedDepositAddress: BitcoinAddress,
                                    expectedValue: JobCoinValue,
-                                   incomingAddresses: Set[BitcoinAddress])(
+                                   userProvidedAddresses: Set[BitcoinAddress])(
       startTime: Instant,
       timeout: FiniteDuration,
       interval: FiniteDuration): Task[Option[List[Transaction]]] = {
@@ -113,38 +113,64 @@ case class MixerImpl(
           .toEpochMilli >= (startTime.toEpochMilli + timeout.toMillis))
       Task(None)
     else
-      transactionsClient.get().flatMap { transactions =>
-        //Assume we can filter for the list of transactions by time after the watch started
-        val addressesWithTransactions = transactions
-          .filter(_.toAddress == watchedAddress)
+      transactionsClient.get().flatMap { allTransactions =>
+        val addressesWithTransactions = allTransactions
+          .filter(_.toAddress == watchedDepositAddress)
           .groupBy(_.fromAddress)
+
+        val addressesInIncomingWithTransactions = addressesWithTransactions
           .filter {
-            case (Some(k), _) => incomingAddresses.contains(k)
-            case _            => false
+            case (Some(fromAddr), _) => userProvidedAddresses.contains(fromAddr)
+            case _                   => false
           }
 
         val monitoredTransactions =
-          addressesWithTransactions.values.flatten.toList
+          addressesInIncomingWithTransactions.values.flatten.toList
 
         monitoredTransactions match {
           case Nil =>
             Thread.sleep(interval.toMillis)
-            watchForDepositFromAddresses(
-              watchedAddress,
-              expectedValue,
-              incomingAddresses)(Instant.now(), timeout - interval, interval)
-          case trans if trans.map(_.amount.value).sum < expectedValue.value =>
+            watchForDepositFromAddresses(watchedDepositAddress,
+                                         expectedValue,
+                                         userProvidedAddresses)(
+              Instant.now(),
+              timeout - interval,
+              interval)
+
+          case transactions
+              if transactions.map(_.amount.value).sum < expectedValue.value =>
             Thread.sleep(interval.toMillis)
-            watchForDepositFromAddresses(
-              watchedAddress,
-              expectedValue,
-              incomingAddresses)(Instant.now(), timeout - interval, interval)
-          case trans => Task(Some(trans))
+            watchForDepositFromAddresses(watchedDepositAddress,
+                                         expectedValue,
+                                         userProvidedAddresses)(
+              Instant.now(),
+              timeout - interval,
+              interval)
+
+          case transactionsSummingToExpectedValue => {
+            unconfirmedDeposits.remove(watchedDepositAddress)
+            remainingPayouts.update(
+              userProvidedAddresses,
+              JobCoinValue(
+                transactionsSummingToExpectedValue.map(_.amount.value).sum))
+            Task(Some(transactionsSummingToExpectedValue))
+          }
         }
       }
   }
 
-  def payout(): Task[Unit] = ???
+  /**
+    * 6) Then, over some time the mixer will use the house account to dole out your bitcoin
+    *   in smaller increments to the withdrawal addresses that you provided,
+    *   possibly after deducting a fee.
+    */
+  def payoutLongRunning(
+      scheduler: (Instant) => FiniteDuration,
+      disburser: (JobCoinValue) => JobCoinValue): Task[Unit] = {
+
+    remainingPayouts
+    ???
+  }
 
 }
 object Mixer
