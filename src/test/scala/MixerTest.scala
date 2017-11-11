@@ -86,7 +86,7 @@ object MixerTest {
         mutable.Map.empty)(op: Dependencies[A]) = {
 
     var transactionsStore = FakeData.transactions
-    val addressGenerator = () => BitcoinAddress("fake")
+    val addressGenerator = () => BitcoinAddress("depositAddress")
     implicit val addressesClient: AddressesClient = FakeAddressesClient(
       transactionsStore)
     implicit val transactionsClient: TransactionsClient =
@@ -156,7 +156,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           //======================
           // Act and Assert
           //======================
-          res.runAsync.map(_ shouldBe BitcoinAddress("fake"))
+          res.runAsync.map(_ shouldBe BitcoinAddress("depositAddress"))
       }
     }
 
@@ -283,7 +283,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
 
     }
     "Mixing" - {
-      "payout should payout " in runWithDependencies(
+      "payout should payout" in runWithDependencies(
         payouts = mutable.Map(mySetOfAddresses -> JobCoinValue(10.0))) {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           //======================
@@ -295,7 +295,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
                           mixer.houseAddress,
                           None,
                           JobCoinValue(Double.MaxValue)))
-            payout <- mixer.payoutSingle(i => 1 millisecond, x => x)
+            payout <- Task.defer(mixer.payoutSingle(i => 1 millisecond, x => x))
             allTransactions <- transactionsClient.get()
           } yield {
             houseMoneyFromThinAir should not be 'empty
@@ -321,8 +321,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
                 .value shouldBe JobCoinValue(0.0)
             }
       }
-      """if a watch does not resolve (where there are no completed deposits),
-        |     the mixer should not payout to any of the user provided addresses
+      """if a watch does not resolve (where there are no completed deposits), the mixer should not payout to any of the user provided addresses
       """.stripMargin in runWithDependencies() {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           //======================
@@ -339,24 +338,26 @@ class MixerTest extends AsyncFreeSpec with Matchers {
               mySetOfAddresses)(Instant.now(), .5 seconds, .1 seconds)
           } yield watched
 
-          val watchAndPayoutWithoutCompletionTask = for {
-            _ <- watchTask
-            _ <- mixer
+          val payoutTask = Task.defer(
+            mixer
               .payoutSingle(scheduler = (i: Instant) => 10 milliseconds,
                             disburser = x => x)
-              .onErrorRecoverWith {
-                case t: Throwable => Task(pprintln("timed out"))
-              }
+              .timeout(2 seconds))
 
+          val balancesTask = for {
             valuesAndHistories <- Task.sequence(
               mySetOfAddresses.map(addressesClient.get))
 
           } yield valuesAndHistories
 
+          watchTask.runAsync
+          val cancellablePayout = payoutTask.runAsync
+          Task(cancellablePayout.cancel()).timeout(0.5 seconds).runAsync
+
           //======================
           // Act and Assert
           //======================
-          watchAndPayoutWithoutCompletionTask.runAsync.map { x =>
+          balancesTask.runAsync.map { x =>
             forAll(x) {
               case (JobCoinValue(v), history) =>
                 v should be <= 0.0
@@ -365,8 +366,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           }
       }
 
-      """if a watch resolves (where there are completed deposits),
-        |     the mixer should make one payout to exactly one user owned receiver account
+      """if a watch resolves (where there are completed deposits), the mixer should make one payout to exactly one user owned receiver account
       """.stripMargin in runWithDependencies() {
         (addressGenerator, addressesClient, transactionsClient, mixer) =>
           //======================
@@ -381,7 +381,11 @@ class MixerTest extends AsyncFreeSpec with Matchers {
               depositAddress,
               myPromisedValue,
               mySetOfAddresses)(Instant.now(), .5 seconds, .1 seconds)
-          } yield watched
+          } yield {
+            watched should not be 'empty
+            watched.value should not be 'empty
+            watched
+          }
 
           val completeDepositTask = for {
             depositAddress <- getDepositAddressTask
@@ -407,37 +411,15 @@ class MixerTest extends AsyncFreeSpec with Matchers {
                           Some(myFundingAccount),
                           JobCoinValue(5)))
           } yield {
-            fulfillDeposit should not be 'empty
-            fulfillDeposit2 should not be 'empty
+            (fulfillDeposit, fulfillDeposit2)
           }
 
-          val watchAndPayoutWithoutCompletionTask = for {
-            _ <- watchTask
-            _ <- completeDepositTask
-            payouts <- mixer
+          val payoutTask = Task.defer(
+            mixer
               .payoutSingle(scheduler = (i: Instant) => 1 millisecond,
-                            disburser = x => x)
+                            disburser = x => x))
 
-            valuesAndHistoriesWithAddresses <- Task.sequence(
-              mySetOfAddresses.map(
-                addr =>
-                  addressesClient
-                    .get(addr)
-                    .map(valAndHist => (addr, valAndHist))))
-
-          } yield {
-            println("=== === === === === === ")
-            pprintln(payouts)
-            println("=== === === === === === ")
-            valuesAndHistoriesWithAddresses
-          }
-
-          //======================
-          // Act and Assert
-          //======================
-          val assertionTask = for {
-            depositAddress <- getDepositAddressTask
-            completedPayout <- watchAndPayoutWithoutCompletionTask
+          val getAllTransactionsTask = for {
             allTransactions <- transactionsClient.get()
           } yield {
 
@@ -446,16 +428,23 @@ class MixerTest extends AsyncFreeSpec with Matchers {
                 t.fromAddress.contains(mixer.houseAddress) && mySetOfAddresses
                   .contains(t.toAddress)
               })
-            pprintln(allTransactions)
-            pprintln(transactionsFromHouseToUserProvidedAccounts)
-            forAll(completedPayout) {
-              case (myAddress, (JobCoinValue(v), history)) =>
-                v should be > 0.0
-                history.filter(_.fromAddress.nonEmpty) shouldBe 'empty
-            }
+            transactionsFromHouseToUserProvidedAccounts
+
           }
 
-          assertionTask.runAsync
+          //======================
+          // Act and Assert
+          //======================
+
+          val res = for {
+            c <- completeDepositTask.runAsync
+            w <- watchTask.runAsync
+            p <- payoutTask.runAsync
+            t <- getAllTransactionsTask.runAsync
+          } yield {
+            p.map(_.value).toSet shouldEqual t.toSet
+          }
+          res
       }
     }
   }

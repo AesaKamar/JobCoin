@@ -1,6 +1,7 @@
 import java.time.Instant
 import java.util.UUID
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.util.{Failure, Random, Success}
@@ -81,15 +82,15 @@ trait Mixer {
   *   possibly after deducting a fee.
   */
 case class MixerImpl(
-    remainingPayouts: mutable.Map[Set[BitcoinAddress], JobCoinValue],
-    unconfirmedDeposits: mutable.Map[BitcoinAddress, Set[BitcoinAddress]],
-    mixerOwnedAddresses: mutable.Set[BitcoinAddress])(
+    var remainingPayouts: mutable.Map[Set[BitcoinAddress], JobCoinValue],
+    var unconfirmedDeposits: mutable.Map[BitcoinAddress, Set[BitcoinAddress]],
+    var mixerOwnedAddresses: mutable.Set[BitcoinAddress])(
     val generateAddress: () => BitcoinAddress)(
     implicit val addressesClient: AddressesClient,
     val transactionsClient: TransactionsClient)
     extends Mixer {
 
-  lazy val houseAddress: BitcoinAddress = generateAddress()
+  lazy val houseAddress: BitcoinAddress = BitcoinAddress("houseAddress")
 
   /**
     * 1) You provide  a list of new, unused addresses that you own to the mixer;
@@ -172,45 +173,37 @@ case class MixerImpl(
     *   in smaller increments to the withdrawal addresses that you provided,
     *   possibly after deducting a fee.
     */
-  def payoutSingle(scheduler: (Instant) => FiniteDuration,
-                   disburser: (JobCoinValue) => JobCoinValue)
+  final def payoutSingle(scheduler: (Instant) => FiniteDuration,
+                         disburser: (JobCoinValue) => JobCoinValue)
     : Task[Seq[Option[Transaction]]] = {
+    Task.defer(
+      Task.gather(remainingPayouts.map {
+        case (addresses, remainingPayout) if remainingPayout.value <= 0 =>
+          Task(None)
+        case (addresses, remainingPayout) =>
+          val amountToDisburse = disburser(remainingPayout)
+          val addressToDisburseTo = Mixer.random(addresses)
 
-    val scheduledDisbursementTasks
-      : mutable.Iterable[Task[Option[Transaction]]] = remainingPayouts.map {
-      case (addresses, remainingPayout) if remainingPayout.value <= 0 =>
-//        remainingPayouts.remove(addresses)
-        Task(None)
-      case (addresses, remainingPayout) =>
-        val amountToDisburse = disburser(remainingPayout)
-        val addressToDisburseTo = Mixer.random(addresses)
+          val transaction = Transaction(Instant.now(),
+                                        addressToDisburseTo,
+                                        Some(houseAddress),
+                                        amountToDisburse)
 
-        val transaction = Transaction(Instant.now(),
-                                      addressToDisburseTo,
-                                      Some(houseAddress),
-                                      amountToDisburse)
-
-        for {
-          transactionResult <- transactionsClient.post(transaction)
-        } yield {
-          transactionResult match {
-            case s @ Some(tr) =>
-              remainingPayouts.update(
-                addresses,
-                JobCoinValue(remainingPayout.value - tr.amount.value))
-              s
-            case None =>
-              None
+          for {
+            transactionResult <- transactionsClient.post(transaction)
+          } yield {
+            transactionResult match {
+              case s @ Some(tr) =>
+                remainingPayouts.update(
+                  addresses,
+                  JobCoinValue(remainingPayout.value - tr.amount.value))
+                s
+              case None =>
+                None
+            }
           }
-        }
-    }
-
-    if (scheduledDisbursementTasks.isEmpty)
-      println("payouts empty")
-    else println("payouts remaining")
-
-    Task.sequence(scheduledDisbursementTasks.toSeq)
-
+      }.toSeq)
+    )
   }
 
 }
