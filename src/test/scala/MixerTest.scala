@@ -27,7 +27,7 @@ case class FakeAddressesClient private (
     var transactions: ListBuffer[Transaction])
     extends AddressesClient {
 
-  def get(addr: BitcoinAddress): Task[(JobCoinValue, List[Transaction])] =
+  def get(addr: BitcoinAddress): Task[AddressSummary] =
     Task {
 
       val filteredTransactions = transactions
@@ -35,7 +35,7 @@ case class FakeAddressesClient private (
 
       val balance = filteredTransactions.map(_.amount.value).sum
 
-      (JobCoinValue(balance), filteredTransactions.toList)
+      AddressSummary(JobCoinValue(balance), filteredTransactions.toList)
     }
 }
 case class FakeTransactionsClient private (
@@ -52,7 +52,7 @@ case class FakeTransactionsClient private (
       .map(addressesClient.get)
 
     val fromBalance = maybeFromInformation match {
-      case Some(t) => t.map { case (balance, history) => balance }
+      case Some(t) => t.map { case AddressSummary(balance, history) => balance }
       case None    => Task(JobCoinValue(Double.MaxValue))
     }
 
@@ -119,10 +119,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
       // Arrange
       //======================
       val transaction =
-        Transaction(Instant.now,
-                    BitcoinAddress("client"),
-                    None,
-                    JobCoinValue(5))
+        Transaction(BitcoinAddress("client"), None, JobCoinValue(5))
 
       val putGetTask = for {
         put <- transactionsClient.post(transaction)
@@ -181,19 +178,14 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           val completeDepositTask = for {
             depositAddress <- getDepositAddressTask
             moneyFromThinAir <- transactionsClient.post(
-              Transaction(Instant.now,
-                          myFundingAccount,
-                          None,
-                          JobCoinValue(100)))
+              Transaction(myFundingAccount, None, JobCoinValue(100)))
             myAccountBalances <- addressesClient.get(myFundingAccount)
             fulfillDeposit <- transactionsClient.post(
-              Transaction(Instant.now,
-                          depositAddress,
+              Transaction(depositAddress,
                           Some(myFundingAccount),
                           JobCoinValue(5)))
             fulfillDeposit2 <- transactionsClient.post(
-              Transaction(Instant.now,
-                          depositAddress,
+              Transaction(depositAddress,
                           Some(myFundingAccount),
                           JobCoinValue(5)))
           } yield {
@@ -232,15 +224,11 @@ class MixerTest extends AsyncFreeSpec with Matchers {
 
           val completeDepositTask = for {
             moneyFromThinAir <- transactionsClient.post(
-              Transaction(Instant.now,
-                          myFundingAccount,
-                          None,
-                          JobCoinValue(100)))
+              Transaction(myFundingAccount, None, JobCoinValue(100)))
             depositAddress <- getDepositAddressTask
             myAccountBalances <- addressesClient.get(myFundingAccount)
             fulfillDeposit <- transactionsClient.post(
-              Transaction(Instant.now,
-                          depositAddress,
+              Transaction(depositAddress,
                           Some(myFundingAccount),
                           JobCoinValue(5)))
           } yield fulfillDeposit
@@ -291,8 +279,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           //======================
           val computation = for {
             houseMoneyFromThinAir <- transactionsClient.post(
-              Transaction(Instant.now,
-                          mixer.houseAddress,
+              Transaction(mixer.houseAddress,
                           None,
                           JobCoinValue(Double.MaxValue)))
             payout <- Task.defer(mixer.payoutSingle(i => 1 millisecond, x => x))
@@ -359,7 +346,7 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           //======================
           balancesTask.runAsync.map { x =>
             forAll(x) {
-              case (JobCoinValue(v), history) =>
+              case AddressSummary(JobCoinValue(v), history) =>
                 v should be <= 0.0
                 history shouldBe 'empty
             }
@@ -390,24 +377,18 @@ class MixerTest extends AsyncFreeSpec with Matchers {
           val completeDepositTask = for {
             depositAddress <- getDepositAddressTask
             houseMoneyFromThinAir <- transactionsClient.post(
-              Transaction(Instant.now,
-                          mixer.houseAddress,
+              Transaction(mixer.houseAddress,
                           None,
                           JobCoinValue(Double.MaxValue)))
             myMoneyFromThinAir <- transactionsClient.post(
-              Transaction(Instant.now,
-                          myFundingAccount,
-                          None,
-                          JobCoinValue(100)))
+              Transaction(myFundingAccount, None, JobCoinValue(100)))
             myAccountBalances <- addressesClient.get(myFundingAccount)
             fulfillDeposit <- transactionsClient.post(
-              Transaction(Instant.now,
-                          depositAddress,
+              Transaction(depositAddress,
                           Some(myFundingAccount),
                           JobCoinValue(5)))
             fulfillDeposit2 <- transactionsClient.post(
-              Transaction(Instant.now,
-                          depositAddress,
+              Transaction(depositAddress,
                           Some(myFundingAccount),
                           JobCoinValue(5)))
           } yield {

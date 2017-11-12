@@ -21,10 +21,11 @@ final case class JobCoinValue(value: Double) extends AnyVal
 
 final case class BitcoinAddress(value: String) extends AnyVal
 
-final case class Transaction(timeStamp: Instant,
-                             toAddress: BitcoinAddress,
+final case class Transaction(toAddress: BitcoinAddress,
                              fromAddress: Option[BitcoinAddress],
                              amount: JobCoinValue)
+final case class AddressSummary(balance: JobCoinValue,
+                                transactions: List[Transaction])
 
 sealed trait Transfer
 case object SuccessfulTransfer extends Transfer
@@ -34,7 +35,7 @@ case object FailedTransfer extends Transfer
 //======================
 
 trait AddressesClient {
-  def get(addr: BitcoinAddress): Task[(JobCoinValue, List[Transaction])]
+  def get(addr: BitcoinAddress): Task[AddressSummary]
 }
 
 trait TransactionsClient {
@@ -184,8 +185,7 @@ case class MixerImpl(
           val amountToDisburse = disburser(remainingPayout)
           val addressToDisburseTo = Mixer.random(addresses)
 
-          val transaction = Transaction(Instant.now(),
-                                        addressToDisburseTo,
+          val transaction = Transaction(addressToDisburseTo,
                                         Some(houseAddress),
                                         amountToDisburse)
 
