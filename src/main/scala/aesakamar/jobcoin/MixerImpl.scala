@@ -1,75 +1,13 @@
+package aesakamar.jobcoin
+
 import java.time.Instant
-import java.util.UUID
 
-import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.concurrent.duration._
-import scala.util.{Failure, Random, Success}
+import scala.concurrent.duration.FiniteDuration
 
-import cats._
-import cats.data._
-import cats.implicits._
-import monix.eval._
-import monix.cats._
-import pprint._
-
-//======================
-// Domain Objects
-//======================
-
-final case class JobCoinValue(value: Double) extends AnyVal
-
-final case class BitcoinAddress(value: String) extends AnyVal
-
-final case class Transaction(toAddress: BitcoinAddress,
-                             fromAddress: Option[BitcoinAddress],
-                             amount: JobCoinValue)
-final case class AddressSummary(balance: JobCoinValue,
-                                transactions: List[Transaction])
-
-sealed trait Transfer
-case object SuccessfulTransfer extends Transfer
-case object FailedTransfer extends Transfer
-//======================
-// Clients
-//======================
-
-trait AddressesClient {
-  def get(addr: BitcoinAddress): Task[AddressSummary]
-}
-
-trait TransactionsClient {
-  def get(): Task[List[Transaction]]
-  def post(transaction: Transaction): Task[Option[Transaction]]
-}
-
-//======================
-// Domain Objects
-//======================
-
-trait Mixer {
-  def addressesClient: AddressesClient
-  def transactionsClient: TransactionsClient
-  def generateAddress: () => BitcoinAddress
-
-  def houseAddress: BitcoinAddress
-
-  def tradeAddressesForNewDepositAddress(
-      incomingAddresses: Set[BitcoinAddress]): Task[BitcoinAddress]
-
-  def watchForDepositFromAddresses(
-      mixerOwnedDepositAddress: BitcoinAddress,
-      expectedValue: JobCoinValue,
-      userProvidedWithdrawalAddresses: Set[BitcoinAddress])(
-      startTime: Instant,
-      timeout: FiniteDuration,
-      interval: FiniteDuration): Task[Option[List[Transaction]]]
-
-  def payoutSingle(
-      scheduler: (Instant) => FiniteDuration,
-      disburser: (JobCoinValue) => JobCoinValue): Task[Seq[Option[Transaction]]]
-
-}
+import aesakamar.jobcoin.models.{BitcoinAddress, JobCoinValue, Transaction}
+import aesakamar.jobcoin.clients.{AddressesClient, TransactionsClient}
+import monix.eval.Task
 
 /**
   * 1) You provide  a list of new, unused addresses that you own to the mixer;
@@ -83,9 +21,9 @@ trait Mixer {
   *   possibly after deducting a fee.
   */
 case class MixerImpl(
-    var remainingPayouts: mutable.Map[Set[BitcoinAddress], JobCoinValue],
-    var unconfirmedDeposits: mutable.Map[BitcoinAddress, Set[BitcoinAddress]],
-    var mixerOwnedAddresses: mutable.Set[BitcoinAddress])(
+                      var remainingPayouts: mutable.Map[Set[BitcoinAddress], JobCoinValue],
+                      var unconfirmedDeposits: mutable.Map[BitcoinAddress, Set[BitcoinAddress]],
+                      var mixerOwnedAddresses: mutable.Set[BitcoinAddress])(
     val generateAddress: () => BitcoinAddress)(
     implicit val addressesClient: AddressesClient,
     val transactionsClient: TransactionsClient)
@@ -127,11 +65,6 @@ case class MixerImpl(
           .filter(_.toAddress == mixerOwnedDepositAddress)
           .groupBy(_.fromAddress)
 
-//        val addressesInIncomingWithTransactions = addressesWithTransactions
-//          .filter {
-//            case (Some(fromAddr), _) => userProvidedWithdrawalAddresses.contains(fromAddr)
-//            case _                   => false
-//          }
 
         val monitoredTransactions =
           addressesWithTransactions.values.flatten.toList
@@ -161,7 +94,7 @@ case class MixerImpl(
             mixerOwnedAddresses.add(mixerOwnedDepositAddress)
             remainingPayouts.update(
               userProvidedWithdrawalAddresses,
-              JobCoinValue(
+              models.JobCoinValue(
                 transactionsSummingToExpectedValue.map(_.amount.value).sum))
             Task(Some(transactionsSummingToExpectedValue))
           }
@@ -206,10 +139,4 @@ case class MixerImpl(
     )
   }
 
-}
-object Mixer {
-  def random[T](s: Set[T]): T = {
-    val n = util.Random.nextInt(s.size)
-    s.iterator.drop(n).next
-  }
 }

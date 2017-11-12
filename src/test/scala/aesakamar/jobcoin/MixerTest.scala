@@ -1,22 +1,20 @@
+package aesakamar.jobcoin
+
 import java.time.Instant
 
-import org.scalatest._
-import org.scalatest.OptionValues._
-import org.scalatest.Inspectors._
-import scala.concurrent.duration._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.collection.parallel.FutureThreadPoolTasks
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
-import Mixer._
-import cats._
-import cats.data._
-import cats.implicits._
+import aesakamar.jobcoin.models.{AddressSummary, BitcoinAddress, JobCoinValue, Transaction}
+import aesakamar.jobcoin.clients.{AddressesClient, TransactionsClient}
 import monix.eval._
-import monix.cats._
 import monix.execution.Scheduler.Implicits.global
-import pprint._
+import org.scalatest.Inspectors._
+import org.scalatest._
+import org.scalatest.OptionValues._
+import org.scalatest.EitherValues._
 
 object FakeData {
 
