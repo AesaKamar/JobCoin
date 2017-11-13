@@ -8,12 +8,12 @@ import monix.eval.Task
 case class TransactionsClientJobCoinApi() extends TransactionsClient {
   import JobCoinApiClients._
 
-  val url = s"http://jobcoin.gemini.com/shank/api/transactions"
+  val url = Uri("jobcoin.gemini.com", 80, List("shank","api","transactions"))
 
   override def get(): Task[List[Transaction]] = {
 
     val response = sttp
-      .get(Uri(url))
+      .get(url)
       .response(asJson[List[Transaction]])
       .send()
 
@@ -24,7 +24,7 @@ case class TransactionsClientJobCoinApi() extends TransactionsClient {
   override def post(transaction: Transaction): Task[Option[Transaction]] = {
 
     val response = sttp
-      .post(Uri(url))
+      .post(url)
       .body(transaction)
       .response(asString)
       .send()

@@ -9,10 +9,10 @@ case class AddressesClientJobCoinApi() extends AddressesClient {
   import aesakamar.jobcoin.clients.JobCoinApiClients._
   override def get(addr: BitcoinAddress): Task[AddressSummary] = {
 
-    val url = s"http://jobcoin.gemini.com/shank/api/addresses/${addr.value}"
+    val url = Uri("jobcoin.gemini.com", 80, List("shank","api","addresses", addr.value))
 
     val response = sttp
-      .get(Uri(url))
+      .get(url)
       .response(asJson[AddressSummary])
       .send()
 
