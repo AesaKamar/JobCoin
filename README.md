@@ -3,7 +3,7 @@
 
 ## Project Structure
 The project is divided into several modules, separating out the different concerns of the applciation.
-All code aims to obe purely functional and maintiain referential transparency. 
+All code aims to be purely functional and maintiain referential transparency. 
 
 ### A note on comments and style
 I generally discourage myself frow writing comments in the code, as I feel it can lead me to more easily justify writing less-than-easily-readable code. Hopefully, choices in variable naming and strong type signatures should be able to self-document in an enforceable way. Only public contract-level items are documented, as per guidelines of `ScalaDoc`. 
